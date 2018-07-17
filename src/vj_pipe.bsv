@@ -789,7 +789,7 @@ module mkVJpipe( VJ_ifc );
     
 
 
-//            $display("ii %d %d %d", row, col, unpack(p.px));
+            $display("ii %d %d %d", row, col, unpack(p.px));
 
         for( Sizet_20 u = 0; u<sz; u=u+1)
 		begin
@@ -819,7 +819,7 @@ module mkVJpipe( VJ_ifc );
 			col <= col + 1;
 		end
 
-		if(row>25)
+		if(row>30)
 		begin
             $finish(0);
 		end
@@ -938,7 +938,7 @@ module mkVJpipe( VJ_ifc );
     rule compute_stddev(!init && !init_bram && curr_state == 1);
 
             tstddev <= unpack(sii[0][0] - sii[0][1] - sii[1][0] + sii[1][1]) ;
-            //$display("stddev %d ", tstddev);
+            $display("stddev %d ", tstddev);
 
             curr_state <= -1;
 	endrule
@@ -1549,8 +1549,8 @@ end
       //  $display("w2: %d w3: %d", r.weights2, r.weights3);
 		let classifier_sum=r.rect1*(-4096) + r.rect2*r.weights2 + r.rect3*r.weights3;
 		hc1 <= hc1 + 1;
-                //$display("hc %d sum %d",hc1, classifier_sum);
-                //$display("thresh: %d, stddev0: %d",r.wc_thresh, stddev0);
+                $display("hc %d sum %d",hc1, classifier_sum);
+                $display("thresh: %d, stddev0: %d",r.wc_thresh, stddev0);
                 if(classifier_sum>=(r.wc_thresh*stddev0) )
 		begin
                         //$display("A2");
@@ -1572,7 +1572,7 @@ end
 	rule wc_check ( !init && !init_bram && curr_state == 3  );
 
 
-                //$display("cur_stage %d stagesum %d\n",cur_stage, stage_sum);
+                $display("cur_stage %d stagesum %d\n",cur_stage, stage_sum);
 		if(stage_sum>stage_thresh[cur_stage]) //continue
 		begin
 			if( cur_stage == (n_stages-1) )
@@ -1653,7 +1653,7 @@ end
         method Action  put(PCIE_PKT pcie_pkt) if(curr_state == 0 && !init && !init_bram );
             
             Vector #(4, Pixels) raw_data = unpack (pcie_pkt.data);
-            $display("%d", unpack(raw_data[3]));
+            //$display("%d", unpack(raw_data[3]));
             input_fifo.enq(raw_data[3]);
 
         endmethod

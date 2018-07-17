@@ -27,31 +27,31 @@ Sizet_20 hf = fromInteger(valueof(HF));
 (* synthesize *)
 module mkVJpipeTb( Empty );
         //BF_ifc img <- mkBramFifoII((valueof(P16)) );
-        RegFile#(Sizet_20, Pixels) rf_r0 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array0.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_r1 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array1.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_r2 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array2.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_r3 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array3.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_r4 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array4.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_r5 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array5.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_r6 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array6.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_r7 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array7.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_r8 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array8.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_r9 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array9.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_r10 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array10.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_r11 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/rectangles_array11.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r0 <- mkRegFileLoad ("../hex_files/rectangles_array0.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r1 <- mkRegFileLoad ("../hex_files/rectangles_array1.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r2 <- mkRegFileLoad ("../hex_files/rectangles_array2.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r3 <- mkRegFileLoad ("../hex_files/rectangles_array3.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r4 <- mkRegFileLoad ("../hex_files/rectangles_array4.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r5 <- mkRegFileLoad ("../hex_files/rectangles_array5.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r6 <- mkRegFileLoad ("../hex_files/rectangles_array6.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r7 <- mkRegFileLoad ("../hex_files/rectangles_array7.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r8 <- mkRegFileLoad ("../hex_files/rectangles_array8.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r9 <- mkRegFileLoad ("../hex_files/rectangles_array9.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r10 <- mkRegFileLoad ("../hex_files/rectangles_array10.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_r11 <- mkRegFileLoad ("../hex_files/rectangles_array11.hex",0,tot_pixels);
 
-        RegFile#(Sizet_20, Pixels) rf_a1 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/alpha1_array.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_a2 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/alpha2_array.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_a1 <- mkRegFileLoad ("../hex_files/alpha1_array.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_a2 <- mkRegFileLoad ("../hex_files/alpha2_array.hex",0,tot_pixels);
 
-        RegFile#(Sizet_20, Pixels) rf_w1 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/weights_array1.hex",0,tot_pixels);
-        RegFile#(Sizet_20, Pixels) rf_w2 <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/weights_array2.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_w1 <- mkRegFileLoad ("../hex_files/weights_array1.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_w2 <- mkRegFileLoad ("../hex_files/weights_array2.hex",0,tot_pixels);
 
-        RegFile#(Sizet_20, Pixels) rf_wct <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/wc_thresh_array.hex",0,tot_pixels);
+        RegFile#(Sizet_20, Pixels) rf_wct <- mkRegFileLoad ("../hex_files/wc_thresh_array.hex",0,tot_pixels);
         
-        RegFile#(Sizet_20, Pixels) rf_bm <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/bmhex.txt",0,totmaps);
-        RegFile#(Sizet_20, Pixels) rf_om <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/omhex.txt",0,totmaps);
+        RegFile#(Sizet_20, Pixels) rf_bm <- mkRegFileLoad ("../hex_files/bmhex.txt",0,totmaps);
+        RegFile#(Sizet_20, Pixels) rf_om <- mkRegFileLoad ("../hex_files/omhex.txt",0,totmaps);
 
-        RegFile#(Sizet_20, Pixels) img <- mkRegFileLoad ("/home/sahithi/fpga/vj_pipeline/hex_files/imghex185.hex",0,tot);
+        RegFile#(Sizet_20, Pixels) img <- mkRegFileLoad ("../hex_files/imghex185.hex",0,tot);
 
 
         Reg#(Sizet_20) clk <- mkReg(0);
@@ -78,13 +78,13 @@ module mkVJpipeTb( Empty );
          BRAM_Configure cfg_bm = defaultValue;
         cfg_bm.allowWriteResponseBypass = False;
         cfg_bm.memorySize = valueof(P12);
-        cfg_bm.loadFormat = tagged Binary "/home/sahithi/fpga/vj_pipeline/mem_files/alpha1_array.txt.mem";
+        cfg_bm.loadFormat = tagged Binary "../mem_files/alpha1_array.txt.mem";
  BRAM2Port#(Sizet_20, Pixels) br_a1 <- mkBRAM2Server(cfg_bm);
        
-        cfg_bm.loadFormat = tagged Binary "/home/sahithi/fpga/vj_pipeline/mem_files/alpha2_array.txt.mem";
+        cfg_bm.loadFormat = tagged Binary "../mem_files/alpha2_array.txt.mem";
  BRAM2Port#(Sizet_20, Pixels) br_a2 <- mkBRAM2Server(cfg_bm);
 
-        cfg_bm.loadFormat = tagged Binary "/home/sahithi/fpga/vj_pipeline/mem_files/wc_thresh_array.txt.mem";
+        cfg_bm.loadFormat = tagged Binary "../mem_files/wc_thresh_array.txt.mem";
  BRAM2Port#(Sizet_20, Pixels) br_wct <- mkBRAM2Server(cfg_bm);
 
         BF_ifc alpha1 <- mkBramfifoA1(br_a1, valueof(P12));
