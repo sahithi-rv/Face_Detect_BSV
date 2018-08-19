@@ -32,7 +32,7 @@ The test bench, src/vj_pipe_tb.bsv,
 
 ### Results
 
-# Sample Input	| # Output
+# Sample Input	  Output
 
-![sample input](/utils/input.png) | ![output](/utils/output.png)
+![sample input](/utils/input.png) 	 ![output](/utils/output.png)
 
