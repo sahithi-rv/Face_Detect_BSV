@@ -14,20 +14,20 @@ Data = np.zeros((R,C), dtype = np.int32)
 for i in range(R):
 	for j in range(C):
 		Data[i][j] = arr1[i][j];
-
-y = 53;
-x = 61;
+ly = [77, 74, 74, 74, 74, 74, 74, 74, 74, 75, 75, 75, 75, 75, 75, 76];
+lx = [85, 78, 79, 80, 81, 134, 153, 154, 155, 78, 79, 80, 81, 106, 107, 106];
 h = 25;
 w = 25;
 
-for i in range(w):
-	Data[y][x+i] = 255;
-for i in range(h):
-	Data[y+i][x+w] = 255;
-for i in range(w):
-	Data[y+h][x+w-i] = 255;
-for i in range(h):
-	Data[y+h-1][x] = 255;
+for x, y in zip(lx, ly):
+	for i in range(w):
+		Data[y-24][x-50+i] = 255;
+	for i in range(h):
+		Data[y-24+i][x-50+w] = 255;
+	for i in range(w):
+		Data[y-24+h][x-50+w-i] = 255;
+	for i in range(h):
+		Data[y-24+h-1][x-50] = 255;
 
 result = Image.fromarray((Data).astype(np.uint8))
 result.save(fileout2);

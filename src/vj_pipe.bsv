@@ -52,6 +52,22 @@ Sizet_6 sz1 = fromInteger(valueof(WSZ));
 Sizet_11 sz2 = fromInteger(valueof(WSZ));
 Sizet_20 init_time = fromInteger(valueof(INIT_TIME));
 
+/*******
+short forms:
+r,c,sz -> row, column, size
+lbuffer -> line buffer
+Coords -> rectangle coordinates
+ii -> integral image
+iwb -> window buffer
+sii -> squared integral image # for standard deviation
+siwb -> squared window buffer 
+w2, w3 -> weights 2 & 3; #weight 1 is a constant.
+wct -> weak classifier threshold
+stddev -> standard deviation
+bm -> bank maps
+om -> offset maps
+
+*******/
 
 (*synthesize*)
 module mkVJpipe( VJ_ifc );
@@ -70,6 +86,8 @@ module mkVJpipe( VJ_ifc );
         FIFOF#(Pixels) input_fifo <- mkSizedFIFOF(100);
         FIFOF#(BitSz_20) output_fifor <- mkSizedFIFOF(100);
         FIFOF#(BitSz_20) output_fifoc <- mkSizedFIFOF(100);
+
+        //buffers for elastic pipeline
 
         FIFOF#(PipeLine) lbuffer_fifo <- mkSizedFIFOF(2);
         FIFOF#(PipeLine) iwb_fifo <- mkSizedFIFOF(2);
@@ -109,6 +127,7 @@ module mkVJpipe( VJ_ifc );
         cfg.allowWriteResponseBypass = False;
         cfg.memorySize = valueof(P12);
 
+        // BRAMs for rectangles, alpha, weights, weak classifier threshold (wc_thresh)
         BRAM2Port#(Sizet_20, BitSz_11) rect0 <- mkBRAM2Server(cfg);
         BRAM2Port#(Sizet_20, BitSz_11) rect1 <- mkBRAM2Server(cfg);
         BRAM2Port#(Sizet_20, BitSz_11) rect2 <- mkBRAM2Server(cfg);
@@ -130,7 +149,7 @@ module mkVJpipe( VJ_ifc );
 
         BRAM2Port#(Sizet_20, Pixels) br_wct <- mkBRAM2Server(cfg);
 
-
+        // instantiating BRAM fifos for rects, alpha, weights, wc_thresh
         BF_ifc20 rect_array0 <- mkBramfifoR0(rect0, valueof(P12));
         BF_ifc20 rect_array1 <- mkBramfifoR1(rect1, valueof(P12));
         BF_ifc20 rect_array2 <- mkBramfifoR2(rect2, valueof(P12));
@@ -182,6 +201,8 @@ module mkVJpipe( VJ_ifc );
         cfg_bm.allowWriteResponseBypass = False;
         cfg_bm.memorySize = valueof(P10);
         //cfg_bm.loadFormat = tagged Binary "/home/sahithi_rvs/Desktop/fpga/vj_pipeline/mem_files/bm.mem";
+
+        // bank maps (bank numbers 1-12)
         BRAM2Port#(Sizet_11, BitSz_6) mem_bm0 <- mkBRAM2Server(cfg_bm);
         BRAM2Port#(Sizet_11, BitSz_6) mem_bm1 <- mkBRAM2Server(cfg_bm);
         BRAM2Port#(Sizet_11, BitSz_6) mem_bm2 <- mkBRAM2Server(cfg_bm);
@@ -196,6 +217,7 @@ module mkVJpipe( VJ_ifc );
         BRAM2Port#(Sizet_11, BitSz_6) mem_bm11 <- mkBRAM2Server(cfg_bm);
 
 
+        //fifos for bank maps 
         FIFORand2 bm0 <- mkBankServer(mem_bm0, valueof(P10)-1);
         FIFORand2 bm1 <- mkBankServer(mem_bm1, valueof(P10)-1);
         FIFORand2 bm2 <- mkBankServer(mem_bm2, valueof(P10)-1);
@@ -209,6 +231,7 @@ module mkVJpipe( VJ_ifc );
         FIFORand2 bm10 <- mkBankServer(mem_bm10, valueof(P10)-1);
         FIFORand2 bm11 <- mkBankServer(mem_bm11, valueof(P10)-1);
 
+        //offset maps (offset in each bank)
         BRAM2Port#(Sizet_11, BitSz_6) mem_om0 <- mkBRAM2Server(cfg_bm);
         BRAM2Port#(Sizet_11, BitSz_6) mem_om1 <- mkBRAM2Server(cfg_bm);
         BRAM2Port#(Sizet_11, BitSz_6) mem_om2 <- mkBRAM2Server(cfg_bm);
@@ -222,6 +245,7 @@ module mkVJpipe( VJ_ifc );
         BRAM2Port#(Sizet_11, BitSz_6) mem_om10 <- mkBRAM2Server(cfg_bm);
         BRAM2Port#(Sizet_11, BitSz_6) mem_om11 <- mkBRAM2Server(cfg_bm);
 
+        //fifos for offset maps
         FIFORand2 om0 <- mkOffServer(mem_om0, valueof(P10)-1);
         FIFORand2 om1 <- mkOffServer(mem_om1, valueof(P10)-1);
         FIFORand2 om2 <- mkOffServer(mem_om2, valueof(P10)-1);
@@ -235,6 +259,7 @@ module mkVJpipe( VJ_ifc );
         FIFORand2 om10 <- mkOffServer(mem_om10, valueof(P10)-1);
         FIFORand2 om11 <- mkOffServer(mem_om11, valueof(P10)-1);
 
+        /*** classifying the brams into banks ***/
         // 0-3 : r0- r3
         // 4-7 : r4-r7
         // 8-11 : r8 - r11
@@ -274,14 +299,16 @@ module mkVJpipe( VJ_ifc );
             iterations <= iterations + 1;
         endrule
 
+        // Intitializing step - keep a check until brams are loaded.
         rule donebr_counter (init_bram && !init  && iterations >= init_time);
             init_bram <= False;
             init <= True;
-            $display("done bram");
+        //    $display("done bram");
         endrule
 
+        //write to brams one after the other - sending 4 data elements one after the other (filling 4 at a time - 128bits)
         rule write_br_r0 (init_bram && !init  );
-            let data = bram_init_fifo[0].first;
+            let data = bram_init_fifo[0].first; // the data is fed from the test-bench
             bram_init_fifo[0].deq();
 
             BitSz_11 x = truncate(data);
@@ -689,6 +716,7 @@ module mkVJpipe( VJ_ifc );
             wc_thresh.enq(data);
         endrule
 
+        //simply deq the last 3*32 bits - not necessary
         rule justdeq(init_bram && !init );
             bram_init_fifo[43].deq();
             bram_init_fifo[41].deq();
@@ -696,6 +724,9 @@ module mkVJpipe( VJ_ifc );
 
         endrule
 
+        // END OF INITIALIZING BRAMS BRAMS
+
+// INITIALIZE INTEGRAL IMAGE
     rule init_ii(init && !init_bram);
 		for( Sizet_20 u = 0;u<sz; u=u+1)
 		begin
@@ -776,6 +807,7 @@ module mkVJpipe( VJ_ifc );
 	endrule
 
 
+    // updating integral image
     rule update_ii(!init && !init_bram && curr_state == 0);
 
 //		dummy_fifo4.deq();
@@ -789,7 +821,7 @@ module mkVJpipe( VJ_ifc );
     
 
 
-            $display("ii %d %d %d", row, col, unpack(p.px));
+        //    $display("ii %d %d %d", row, col, unpack(p.px));
 
         for( Sizet_20 u = 0; u<sz; u=u+1)
 		begin
@@ -800,9 +832,9 @@ module mkVJpipe( VJ_ifc );
 		end
 
 		sii[0][0] <= sii[0][0] + ( siwb[0][1] - siwb[0][0] );
-                sii[0][1] <= sii[0][1] + ( siwb[0][sz] - siwb[0][0] );
-                sii[1][0] <= sii[1][0] + ( siwb[sz-1][1] - siwb[sz-1][0] );
-                sii[1][1] <= sii[1][1] + ( siwb[sz-1][sz] - siwb[sz-1][0] );
+        sii[0][1] <= sii[0][1] + ( siwb[0][sz] - siwb[0][0] );
+        sii[1][0] <= sii[1][0] + ( siwb[sz-1][1] - siwb[sz-1][0] );
+        sii[1][1] <= sii[1][1] + ( siwb[sz-1][sz] - siwb[sz-1][0] );
 
 		for(Sizet_20 i = 0; i < (sz-1); i = i+1) // wrt to lbuffer
 		begin 
@@ -819,7 +851,7 @@ module mkVJpipe( VJ_ifc );
 			col <= col + 1;
 		end
 
-		if(row>30)
+		if(row>80)
 		begin
             $finish(0);
 		end
@@ -838,6 +870,7 @@ module mkVJpipe( VJ_ifc );
 
 	endrule
 
+    //see bramfifo*.bsv for understanding bramfifo implementation
     rule latch_data(!init && !init_bram   && curr_state == 0);
 		let p = lbuffer2_fifo.first;
 		lbuffer2_fifo.deq();
@@ -851,6 +884,7 @@ module mkVJpipe( VJ_ifc );
 	endrule
 
 
+    // update window buffer 
     rule update_i(!init && !init_bram   && curr_state == 0 );
 
                 let p = lbuffer3_fifo.first;
@@ -891,7 +925,7 @@ module mkVJpipe( VJ_ifc );
 
 	endrule
 
-
+    // write to lbuffer
     rule write_lbuffer(!init && !init_bram   && curr_state == 0 );
 
                let p = iwb_fifo.first;
@@ -935,10 +969,11 @@ module mkVJpipe( VJ_ifc );
         Reg#(UData_32) stddev2 <- mkReg(0);
 
 
+//compute standard deviation
     rule compute_stddev(!init && !init_bram && curr_state == 1);
 
             tstddev <= unpack(sii[0][0] - sii[0][1] - sii[1][0] + sii[1][1]) ;
-            $display("stddev %d ", tstddev);
+         //   $display("stddev %d ", tstddev);
 
             curr_state <= -1;
 	endrule
@@ -974,6 +1009,7 @@ module mkVJpipe( VJ_ifc );
         endrule
 
 
+//compute squareroot (15+1 cause 32 bits)
 
 for (Sizet_20 i = 0;i<15;i = i +1)
 begin
@@ -1077,9 +1113,9 @@ end
 		rect_array8.latchData;
 		rect_array9.latchData;
 		rect_array10.latchData;
-                rect_array11.latchData;
+        rect_array11.latchData;
 
-                dummy_fifo2.enq(1);
+        dummy_fifo2.enq(1);
 
 
 	endrule
@@ -1087,7 +1123,7 @@ end
     rule wc_compute(!init && !init_bram &&  curr_state == 2);
 		dummy_fifo2.deq();
 
-                Coords p;
+        Coords p;
 
 		let a1 = rect_array0.get;
 		let a2 = rect_array1.get;
@@ -1103,20 +1139,20 @@ end
 		let a12 = rect_array11.get;
 
 
-                p.x1 = unpack(a1);
-                p.y1 = unpack(a2);
-                p.w1 = unpack(a3);
-                p.h1 = unpack(a4);
-                p.x2 = unpack(a5);
-                p.y2 = unpack(a6);
-                p.w2 = unpack(a7);
-                p.h2 = unpack(a8);
-                p.x3 = unpack(a9);
-                p.y3 = unpack(a10);
-                p.w3 = unpack(a11);
-                p.h3 = unpack(a12);
+        p.x1 = unpack(a1);
+        p.y1 = unpack(a2);
+        p.w1 = unpack(a3);
+        p.h1 = unpack(a4);
+        p.x2 = unpack(a5);
+        p.y2 = unpack(a6);
+        p.w2 = unpack(a7);
+        p.h2 = unpack(a8);
+        p.x3 = unpack(a9);
+        p.y3 = unpack(a10);
+        p.w3 = unpack(a11);
+        p.h3 = unpack(a12);
 
-                bfifo.enq(p);
+        bfifo.enq(p);
 	endrule
 
         rule wc_compute1 (!init && !init_bram && curr_state == 2);
@@ -1549,8 +1585,8 @@ end
       //  $display("w2: %d w3: %d", r.weights2, r.weights3);
 		let classifier_sum=r.rect1*(-4096) + r.rect2*r.weights2 + r.rect3*r.weights3;
 		hc1 <= hc1 + 1;
-                $display("hc %d sum %d",hc1, classifier_sum);
-                $display("thresh: %d, stddev0: %d",r.wc_thresh, stddev0);
+              //  $display("hc %d sum %d",hc1, classifier_sum);
+              //  $display("thresh: %d, stddev0: %d",r.wc_thresh, stddev0);
                 if(classifier_sum>=(r.wc_thresh*stddev0) )
 		begin
                         //$display("A2");
@@ -1572,14 +1608,14 @@ end
 	rule wc_check ( !init && !init_bram && curr_state == 3  );
 
 
-                $display("cur_stage %d stagesum %d\n",cur_stage, stage_sum);
+             //   $display("cur_stage %d stagesum %d\n",cur_stage, stage_sum);
 		if(stage_sum>stage_thresh[cur_stage]) //continue
 		begin
 			if( cur_stage == (n_stages-1) )
 			begin 
 
 				//face 
-               // $display("face detected: %d %d\n",row,col);
+             //   $display("face detected: %d %d\n",row,col);
 				cur_stage <= 0;
 				haar_counter <= 0;
 				stage_sum <= 0;
@@ -1615,7 +1651,7 @@ end
 		end
 		else 
 		begin
-             // $display("no face");
+        //    $display("no face");
 			curr_state <= 0;
 			stage_sum <= 0;
 			haar_counter <= 0;

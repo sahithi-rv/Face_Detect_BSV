@@ -8,7 +8,7 @@ make vj_pipe
 
 ### Hex Files
 
-The .hex files have the following set of data:
+The hex_files/.hex files have the following set of data:
 
 * 1 haar feature = 3 rectangles x 4 coordinates -- 12 rect files
 * 1 threshold per haar feature -- 1 thresh file
@@ -18,7 +18,7 @@ The .hex files have the following set of data:
 
 ### Test Bench
 
-The test bench, vj_pipe_tb.bsv,
+The test bench, src/vj_pipe_tb.bsv,
  * initializes the brams using initbram method
  * sends a pixel whenever the module is ready for input
  * receives the output, coordinates where the face is detected.
@@ -29,4 +29,10 @@ The test bench, vj_pipe_tb.bsv,
 * initializes brams for a initial set of clock cycles.
 * Follows the viola jones face detection algorithm to detect faces
 * when a face is detected, the coordinates of the window are output.
+
+### Results
+
+# Sample Input	| # Output
+
+![sample input](/utils/input.png) | ![output](/utils/output.png)
 
