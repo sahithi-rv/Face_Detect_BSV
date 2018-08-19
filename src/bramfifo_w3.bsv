@@ -4,7 +4,7 @@ import FIFO::*;
 import constants::*;
 import BF_IFC::*;
 
-
+//MODULE FOR BRAMFIFO FOR WEIGHT3
 module mkBramfifoW3#( BRAM2Port#(Sizet_20, Pixels) memory, Integer width)(BF_ifc);
         /*BRAM_Configure cfg = defaultValue;
 	cfg.allowWriteResponseBypass = False;

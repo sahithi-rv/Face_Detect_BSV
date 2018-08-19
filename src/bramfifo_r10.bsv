@@ -4,7 +4,7 @@ import FIFO::*;
 import constants::*;
 import BF_IFC_20::*;
 
-
+//MODULE FOR BRAMFIFO FOR RECT10
 module mkBramfifoR10#( BRAM2Port#(Sizet_20, BitSz_11) memory, Integer width)(BF_ifc20);
         /*BRAM_Configure cfg = defaultValue;
 	cfg.allowWriteResponseBypass = False;

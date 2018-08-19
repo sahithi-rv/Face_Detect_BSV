@@ -4,7 +4,7 @@ import FIFO::*;
 import constants::*;
 import BF_IFC::*;
 
-
+//MODULE FOR BRAMFIFO FOR THRESHOLD
 module mkBramfifoWT#( BRAM2Port#(Sizet_20, Pixels) memory, Integer width)(BF_ifc);
         /*BRAM_Configure cfg = defaultValue;
 	cfg.allowWriteResponseBypass = False;

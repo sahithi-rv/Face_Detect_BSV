@@ -2,6 +2,7 @@ package bank_IFC;
 
 import constants::*;
 
+//INTERFACE FOR BRAM FIFOS  OF BANK AND OFFSET MAP
 interface FIFORand2;
         method Action enq(BitSz_6 data);
         method Action latchData;

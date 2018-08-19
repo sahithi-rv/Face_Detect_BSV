@@ -4,6 +4,7 @@ import FIFO::*;
 import constants::*;
 import bank_IFC::*;
 
+//BRAMFIFO MODULE FOR BANKS
 module mkBankServer#(BRAM2Port#(Sizet_11, BitSz_6) memory, Integer width)(FIFORand2);
 
         /*BRAM_Configure cfg_bm = defaultValue;

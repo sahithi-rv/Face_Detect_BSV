@@ -12,6 +12,7 @@ import constants::*;
 endinterface
 */
 
+//INTERFACE FOR vj pipe
 interface VJ_ifc;
     method Action  put (PCIE_PKT px);
     method Action  putbram (PCIE_PKT px);
